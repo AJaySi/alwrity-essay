@@ -10,15 +10,12 @@ def main():
     set_page_config()
     custom_css()
     hide_elements()
-    sidebar()
     title_and_description()
     input_section()
 
 def set_page_config():
     st.set_page_config(
         page_title="Alwrity",
-        layout="wide",
-        page_icon="img/logo.png"
     )
 
 def custom_css():
@@ -57,49 +54,9 @@ def hide_elements():
     hide_streamlit_footer = '<style>#MainMenu {visibility: hidden;} footer {visibility: hidden;}</style>'
     st.markdown(hide_streamlit_footer, unsafe_allow_html=True)
 
-def sidebar():
-    st.sidebar.image("img/alwrity.jpeg", use_column_width=True)
-    st.sidebar.markdown("🧕 :red[Checkout Alwrity], complete **AI writer & Blogging solution**:[Alwrity](https://alwrity.netlify.app)")
-
 
 def title_and_description():
     st.title("✍️ Alwrity - AI Essay Writer")
-    with st.expander("What is **AI Essay writer** & **How to Use**? 📝❗"):
-        st.markdown('''
-        Choose the inputs carefully and as per your requirements. Below are the options for the inputs.
-        ## Essay Types and Education Levels
-
-		### Essay Types
-		- **Argumentative**: Forming an opinion via research. Building an evidence-based argument.
-		- **Expository**: Knowledge of a topic. Communicating information clearly.
-		- **Narrative**: Creative language use. Presenting a compelling narrative.
-		- **Descriptive**: Creative language use. Describing sensory details.
-		
-		### Education Levels
-		- **Primary School**
-		- **High School**
-		- **College**
-		- **Graduate School**
-		-----------------------------
-
-		## Inputs and Details
-		
-		### Essay Type
-		Choose the type of essay you want to write from the options provided.
-		
-		### Education Level
-		Select your current level of education from the given choices.
-		
-		### Essay Title
-		Enter the title of your essay. The title should accurately reflect the content and focus of your essay.
-		
-		### Number of Pages
-		Select the length of your essay by choosing one or more options:
-		- **Short Form (1-2 pages)**
-		- **Medium Form (3-5 pages)**
-		- **Long Form (6+ pages)**
-            ---
-        ''')
 
 
 def input_section():
@@ -145,23 +102,7 @@ def input_section():
             else:
                 st.error("Essay Title is needed, it needs to be 3 words long !")
 
-    page_bottom()
 
-
-def page_bottom():
-    """Display the bottom section of the web app."""
-
-    st.markdown('''
-    AI Essay Generator, Powered by AI (Gemini Pro).
-
-    Implemented by [Alwrity](https://alwrity.netlify.app).
-
-    ''')
-
-    st.markdown("""
-    ### Free & No Signup. Open Source AI Essay Writer.
-
-    """)
 
 if __name__ == "__main__":
     main()
