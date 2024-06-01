@@ -8,6 +8,7 @@ import os
 from google.api_core import retry
 import google.generativeai as genai
 from pprint import pprint
+import streamlit as st
 
 
 def generate_with_retry(model, prompt):
@@ -49,67 +50,69 @@ def ai_essay_generator(essay_title, selected_essay_type, selected_education_leve
         Follow the below writing guidelines for writing your essay:
         1). You specialize in {selected_essay_type} essay writing.
         2). Your target audiences include readers from {selected_education_level} level.
-        3). The title of the essay is {essay_title}.
-        4). I will provide you with web research for essay title.
-        5). The final essay should of {selected_num_pages} words/pages.
-        3). Plant the seeds of subplots or potential character arc shifts that can be expanded later.
+        3). The final essay should of {selected_num_pages} words/pages. 
+        4). Focus of readibility, MLA formatting of your content.
+        5). Important to adapt your language, tone, voice for the target audience of {selected_education_level}.
 
         Remember, your main goal is to write as much as you can. If you get through
-        the story too fast, that is bad. Expand, never summarize.
+        the essay too fast, that is bad. Expand, never summarize.
         '''
         # Generate prompts
         premise_prompt = f'''\
         As an expert essay writer, specilizing in {selected_essay_type} essay writing.
 
         Write an Essay title for given keywords {essay_title}. 
-        The title should appeal to audience level of {selected_education_level}.
+        The title should be for audience level of {selected_education_level}.
         '''
 
         outline_prompt = f'''\
-        As an expert essay writer, specilizing in {selected_essay_type} essay writing.
-
+        As an expert essay writer for {selected_education_level}, specilizing in {selected_essay_type} essay writing.
+        
         Your Essay title is:
 
         {{premise}}
 
-        Write an outline for the essay.
+        Write an outline for the given essay title above. Your outline can be expanded to word length of {selected_num_pages} pages.
         '''
 
         starting_prompt = f'''\
-        As an expert essay writer, specilizing in {selected_essay_type} essay writing.
+        As an expert {selected_education_level} essay writer, specilizing in {selected_essay_type} essay writing.
 
         Your essay title is:
 
-        {{premise}}
+        """{{premise}}"""
 
         The outline of the Essay is:
 
-        {{outline}}
+        """{{outline}}"""
 
-        First, silently review the outline and the essay title. Consider how to start the Essay.
+        First, silently review the outline and the essay title. Take your time, do not rush to start writing.
+        Consider how to start the Essay.
         Start to write the very beginning of the Essay. You are not expected to finish
         the whole Essay now. Your writing should be detailed enough that you are only
         scratching the surface of the first bullet of your outline. Try to write AT
-        MINIMUM 1000 WORDS.
+        MINIMUM 600 WORDS.
 
-        {guidelines}
+        """{guidelines}"""
         '''
 
         continuation_prompt = f'''\
-        As an expert essay writer, specilizing in {selected_essay_type} essay writing.
+        As an expert {selected_education_level} essay writer, specilizing in {selected_essay_type} essay writing.
 
         Your essay title is:
 
-        {{premise}}
+        """{{premise}}"""
 
         The outline of the Essay is:
 
-        {{outline}}
+        """{{outline}}"""
 
         You've begun to write the essay and continue to do so.
-        Here's what you've written so far:
+        Make sure not to repeat the content, review the content first and writing next sections.
 
-        {{story_text}}
+        Below is what you have written so far:
+
+        """{{story_text}}"""
 
         =====
 
@@ -119,11 +122,11 @@ def ai_essay_generator(essay_title, selected_essay_type, selected_education_leve
         Your task is to continue where you left off and write the next part of the Essay.
         You are not expected to finish the whole essay now. Your writing should be
         detailed enough that you are only scratching the surface of the next part of
-        your outline. Try to write AT MINIMUM 1000 WORDS. However, only once the essay
+        your outline. Try to write AT MINIMUM 600 WORDS. However, only once the essay
         is COMPLETELY finished, write IAMDONE. Remember, do NOT write a whole chapter
         right now.
 
-        {guidelines}
+        """{guidelines}"""
         '''
 
         # Configure generative AI
@@ -134,23 +137,25 @@ def ai_essay_generator(essay_title, selected_essay_type, selected_education_leve
         # Generate prompts
         try:
             premise = generate_with_retry(model, premise_prompt).text
-            print(f"The title of the Essay is: {premise}")
+            st.info(f"**The Essay Title is:** {premise}")
         except Exception as err:
-            print(f"Essay title Generation Error: {err}")
+            st.error(f"Essay title Generation Error: {err}")
             return
 
         outline = generate_with_retry(model, outline_prompt.format(premise=premise)).text
-        print(f"The Outline of the essay is: {outline}\n\n")
+        with st.expander("Click to Checkout the outline, writing still in progress.."):
+            st.markdown(f"The Outline of the essay is: {outline}\n\n")
+
         if not outline:
-            print("Failed to generate Essay outline. Exiting...")
-            return
+            st.error("Failed to generate Essay outline. Exiting...")
+            return False
 
         try:
             starting_draft = generate_with_retry(model, 
                     starting_prompt.format(premise=premise, outline=outline)).text
-            pprint(starting_draft)
+            #pprint(starting_draft)
         except Exception as err:
-            print(f"Failed to Generate Essay draft: {err}")
+            st.error(f"Failed to Generate Essay draft: {err}")
             return
 
         try:
@@ -159,25 +164,28 @@ def ai_essay_generator(essay_title, selected_essay_type, selected_education_leve
                     continuation_prompt.format(premise=premise, outline=outline, story_text=draft)).text
             pprint(continuation)
         except Exception as err:
-            print(f"Failed to write the initial draft: {err}")
+            st.error(f"Failed to write the initial draft: {err}")
 
         # Add the continuation to the initial draft, keep building the story until we see 'IAMDONE'
         try:
             draft += '\n\n' + continuation
         except Exception as err:
-            print(f"Failed as: {err} and {continuation}")
-        while 'IAMDONE' not in continuation:
-            try:
-                continuation = generate_with_retry(model, 
+            st.error(f"Failed as: {err} and {continuation}")
+
+        with st.status("Working very hard for Your Essay...", expanded=True) as status:
+            while 'IAMDONE' not in continuation:
+                try:
+                    status.update(label=f"Writing... Current draft length: {len(draft)} characters")
+                    continuation = generate_with_retry(model,
                         continuation_prompt.format(premise=premise, outline=outline, story_text=draft)).text
-                draft += '\n\n' + continuation
-            except Exception as err:
-                print(f"Failed to continually write the Essay: {err}")
-                return
+                    draft += '\n\n' + continuation
+                except Exception as err:
+                    st.error(f"Failed to continually write the story: {err}")
+                    return
 
         # Remove 'IAMDONE' and print the final story
         final = draft.replace('IAMDONE', '').strip()
         return(final)
 
     except Exception as e:
-        print(f"Main Essay writing: An error occurred: {e}")
+        st.error(f"Main Essay writing: An error occurred: {e}")

@@ -89,18 +89,18 @@ def input_section():
             selected_num_pages = st.selectbox("Select the length of your essay (choose one or more):", options=num_pages_options)
 
 
-        if st.button('AI, Write Essay'):
-            if essay_title.strip():
-                with st.spinner("Generating Essay...💥💥"):
-                    essay_content = ai_essay_generator(essay_title, selected_essay_type, 
+    if st.button('AI, Write Essay'):
+        if essay_title.strip():
+            with st.spinner("Generating Essay...💥💥"):
+                essay_content = ai_essay_generator(essay_title, selected_essay_type, 
                             selected_education_level, selected_num_pages) 
-                    if essay_content:
-                        st.subheader('**👩🔬👩🔬 Your Awesome Essay:**')
-                        st.markdown(essay_content)
-                    else:
-                        st.error("💥 **Failed to generate Essay. Please try again!**")
-            else:
-                st.error("Essay Title is needed, it needs to be 3 words long !")
+                if essay_content:
+                    st.subheader('**👩🔬👩🔬 Your Awesome Essay:**')
+                    st.markdown(essay_content)
+                else:
+                    st.error("💥 **Failed to generate Essay. Please try again!**")
+        else:
+            st.error("Essay Title is needed, it needs to be 3 words long !")
 
 
 
