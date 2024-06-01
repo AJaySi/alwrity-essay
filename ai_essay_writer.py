@@ -91,7 +91,7 @@ def ai_essay_generator(essay_title, selected_essay_type, selected_education_leve
         Start to write the very beginning of the Essay. You are not expected to finish
         the whole Essay now. Your writing should be detailed enough that you are only
         scratching the surface of the first bullet of your outline. Try to write AT
-        MINIMUM 800 WORDS.
+        MINIMUM 1000 WORDS.
 
         """{guidelines}"""
         '''
@@ -122,7 +122,7 @@ def ai_essay_generator(essay_title, selected_essay_type, selected_education_leve
         Your task is to continue where you left off and write the next part of the Essay.
         You are not expected to finish the whole essay now. Your writing should be
         detailed enough that you are only scratching the surface of the next part of
-        your outline. Try to write AT MINIMUM 800 WORDS. However, only once the essay
+        your outline. Try to write AT MINIMUM 1000 WORDS. However, only once the essay
         is COMPLETELY finished, write IAMDONE. Remember, do NOT write a whole chapter
         right now.
 
