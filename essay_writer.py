@@ -16,34 +16,45 @@ def main():
 def set_page_config():
     st.set_page_config(
         page_title="Alwrity",
+        layout="wide",
     )
 
 def custom_css():
     st.markdown("""
         <style>
-            .block-container {
-                padding-top: 0rem;
-                padding-bottom: 0rem;
-                padding-left: 1rem;
-                padding-right: 1rem;
-            }
-        </style>
-    """, unsafe_allow_html=True)
+        ::-webkit-scrollbar-track {
+        background: #e1ebf9;
+        }
 
-    st.markdown("""
-        <style>
-            [class="st-emotion-cache-7ym5gk ef3psqc12"] {
-                display: inline-block;
-                padding: 5px 20px;
-                background-color: #4681f4;
-                color: #FBFFFF;
-                width: 300px;
-                height: 35px;
-                text-align: center;
-                text-decoration: none;
-                font-size: 16px;
-                border-radius: 8px;
-            }
+        ::-webkit-scrollbar-thumb {
+            background-color: #90CAF9;
+            border-radius: 10px;
+            border: 3px solid #e1ebf9;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64B5F6;
+        }
+
+        ::-webkit-scrollbar {
+            width: 16px;
+        }
+        div.stButton > button:first-child {
+            background: #1565C0;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+        }
         </style>
     """, unsafe_allow_html=True)
 
@@ -60,34 +71,58 @@ def title_and_description():
 
 
 def input_section():
-    with st.expander("**PRO-TIP** - Choose your inputs carefully", expanded=True):
+    with st.expander("**💡 PRO-TIP** - Choose your inputs carefully", expanded=True):
         col1, space, col2 = st.columns([5, 0.1, 5])
+        
+        # Enhanced options with explanations
         essay_types = [
-            ("Argumentative", "Argumentative - Forming an opinion via research. Building an evidence-based argument."),
-            ("Expository", "Expository - Knowledge of a topic. Communicating information clearly."),
-            ("Narrative", "Narrative - Creative language use. Presenting a compelling narrative."),
-            ("Descriptive", "Descriptive - Creative language use. Describing sensory details.")
+            ("Argumentative", "Forming an opinion via research. Building an evidence-based argument."),
+            ("Expository", "Knowledge of a topic. Communicating information clearly."),
+            ("Narrative", "Creative language use. Presenting a compelling narrative."),
+            ("Descriptive", "Creative language use. Describing sensory details.")
         ]
 
         education_levels = [
-            ("Primary School", "Primary School"),
-            ("High School", "High School"),
-            ("College", "College"),
-            ("Graduate School", "Graduate School")
+            ("Primary School", "Basic understanding, simple language."),
+            ("High School", "Moderate complexity, clear arguments."),
+            ("College", "Advanced complexity, detailed analysis."),
+            ("Graduate School", "High complexity, critical thinking.")
         ]
+        
         with col1:
-            # Ask the user for type of essay, level of education, and number of pages
-            selected_essay_type = st.selectbox("Choose the type of essay you want to write:", options=[option[0] for option in essay_types])
-            selected_education_level = st.selectbox("Choose your level of education:", options=[option[0] for option in education_levels])
+            # Type of essay with descriptions
+            selected_essay_type = st.selectbox(
+                "📘 **Choose the type of essay you want to write**", 
+                options=[option[0] for option in essay_types],
+                format_func=lambda option: f"{option} - {dict(essay_types)[option]}"
+            )
+            
+            # Education level with descriptions
+            selected_education_level = st.selectbox(
+                "🎓 **Choose your level of education**", 
+                options=[option[0] for option in education_levels],
+                format_func=lambda option: f"{option} - {dict(education_levels)[option]}"
+            )
 
         with col2:
-            # Ask the user for the title of the essay
-            essay_title = st.text_input("Enter the title of your essay:")
+            # Title of the essay with example
+            essay_title = st.text_input(
+                "📝 **Enter the title of your essay**", 
+                placeholder="e.g., The Impact of Climate Change on Marine Life"
+            )
 
-            # Ask the user for the number of pages
-            num_pages_options = ["Short Form (1-2 pages)", "Medium Form (3-5 pages)", "Long Form (6+ pages)"]
-            selected_num_pages = st.selectbox("Select the length of your essay (choose one or more):", options=num_pages_options)
-
+            # Number of pages with descriptions
+            num_pages_options = [
+                "📄 Short Form (1-2 pages)", 
+                "📑 Medium Form (3-5 pages)", 
+                "📚 Long Form (6+ pages)"
+            ]
+            selected_num_pages = st.selectbox(
+                "📏 **Select the length of your essay** (choose one or more):", 
+                options=num_pages_options
+            )
+            
+        st.markdown("**✨ Customize your essay settings to fit your needs. Happy writing!**")
 
     if st.button('AI, Write Essay'):
         if essay_title.strip():
